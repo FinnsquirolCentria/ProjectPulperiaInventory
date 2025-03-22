@@ -106,7 +106,7 @@ option to pay later), etc.
 
 ## 3. UI Prototypes
 
-Add something
+### [Figma - Login and Home Dashboard prototype](https://www.figma.com/design/wYEhgHIKipCAC5AfGXA1rV/Untitled?node-id=0-1&t=r5ik5K9QprlwoLol-1)
 
 ## 4. Information Architecture and Technical Design
 
@@ -115,7 +115,7 @@ Add something
 | Frontend | React.js(Vite) | Fast and responsive UI with a component based structure |
 | Backend | Node.js(Express.js) | Lightweight, scalable, easy REST API setup  |
 | Database | MySQL (Sequelized ORM) | Structured and good scalability |
-| Hosting| Vercel(frontend) + Render(Backend) + Planetscale(Database) + Squarespace (Domain) | Lightweight, scalable, easy REST API setup  |
+| Hosting| Vercel(frontend) + Render(Backend) + Planetscale(Database) + Squarespace (Domain) | Easy deployment & performance |
 | Authentication | JWT | Secure sessions |
 
 ### Database schema
@@ -147,3 +147,121 @@ Add something
 - Integration Testing: Ensure proper communication between Backend and Frontend by testing Enpoints using Postman.
 - Usability Testing: Make sure that the owners are able to use it as expected without complication by asking them to test it and give feedback.
 - Security Testing: Ensuring that the data is safe by conducting a test for SQL injection and authentication issues.
+
+#### Test Scenarios for Use Case 1: Recording a Sale
+1. Login Validation:
+
+    - Scenario: Input valid username and password.
+
+    - Expected Result: User gains access to the dashboard.
+
+    - Scenario: Input invalid credentials.
+
+    - Expected Result: Error message prompts re-entry of credentials.
+
+2. Sale Recording Process:
+
+    - Scenario: Select a product, enter quantity, and confirm pricing.
+
+    - Expected Result: System calculates the total, updates stock level, and displays confirmation.
+
+3. Edge Case:
+
+    - Scenario: Input negative quantity or invalid pricing.
+
+    - Expected Result: Error message indicating invalid input.
+
+#### Test Scenarios for Use Case 2: Checking Inventory
+1.  Inventory Dashboard Display:
+
+    - Scenario: Navigate to the inventory section.
+
+    - Expected Result: List of all products is displayed, with stock levels and low-stock alerts.
+
+2. Alert Functionality:
+
+    - Scenario: Simulate a product reaching the low-stock threshold.
+
+    - Expected Result: System generates low-stock alert.
+
+3. Edge Case:
+
+    - Scenario: Inventory section accessed with no products in stock.
+
+    - Expected Result: System displays "No products available."
+
+#### Test Scenarios for Use Case 3: Restock Notifications
+1. Automatic Alert Generation:
+
+    - Scenario: Simulate product stock dropping below the threshold.
+
+    - Expected Result: Alert generated and sent via the specified notification method.
+
+2. Owner's Review of Notifications:
+
+    - Scenario: Open notifications section to review alerts.
+
+    - Expected Result: Clear list of alerts with actionable insights.
+
+3. Edge Case:
+
+    - Scenario: Notification failure due to system error.
+
+    - Expected Result: Error message informing of failure to generate an alert.
+
+#### Test Scenarios for Use Case 4: Checking Store Status
+1. Client Location Input:
+
+    - Scenario: Input location manually or allow GPS detection.
+
+    - Expected Result: System displays nearby pulperías with relevant details.
+
+2. Map View Functionality:
+
+    - Scenario: Client interacts with the map (zoom, pan).
+
+    - Expected Result: Smooth navigation and accurate store data.
+
+3. Edge Case:
+
+    - Scenario: No pulperías available nearby.
+
+    - Expected Result: Message indicating no stores found within the range.
+
+#### Test Scenarios for Use Case 5: Generating Sales Reports
+1. Report Generation Process:
+
+    - Scenario: Select timeframe and type of report.
+
+    - Expected Result: System generates report with visualized data (charts, tables).
+
+2. Data Exporting:
+
+    - Scenario: Save report as PDF or Excel file.
+
+    - Expected Result: File is saved successfully.
+
+3. Edge Case:
+
+    - Scenario: Attempt to generate a report when no sales data exists.
+
+    - Expected Result: System displays "No sales data available."
+
+#### General Scenarios for Usability and Security
+1. Usability Testing:
+
+    - Scenario: Ask pulpería owners to perform common tasks (record sale, check inventory).
+
+    - Expected Result: Tasks completed without difficulty or confusion.
+
+2. Security Testing:
+
+    - Scenario: Test for SQL injection by inputting malicious data.
+
+    - Expected Result: System rejects malicious inputs and ensures data security.
+
+3. Performance Testing:
+
+    - Scenario: Stress-test the system with 1,000+ sales records and inventory items.
+
+    - Expected Result: System remains responsive and functional.
