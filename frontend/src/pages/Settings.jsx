@@ -19,7 +19,7 @@ const Settings = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       <h2>Settings</h2>
       <form onSubmit={handleSubmit}>
         <div>
@@ -36,6 +36,7 @@ const Settings = () => {
         <div>
           <label>
             Theme:
+            
             <select name="theme" value={settings.theme} onChange={handleChange}>
               <option value="light">Light</option>
               <option value="dark">Dark</option>

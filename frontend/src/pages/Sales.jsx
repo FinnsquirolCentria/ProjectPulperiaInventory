@@ -31,13 +31,33 @@ const Sales = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewSale((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "productId") {
+      const selectedProduct = products.find((product) => product.id === parseInt(value));
+      if (selectedProduct) {
+        setNewSale((prev) => ({
+          ...prev,
+          [name]: value,
+          totalPrice: selectedProduct.price * (prev.quantity || 0),
+        }));
+      }
+    } else if (name === "quantity") {
+      const selectedProduct = products.find((product) => product.id === parseInt(newSale.productId));
+      if (selectedProduct) {
+        setNewSale((prev) => ({
+          ...prev,
+          [name]: value,
+          totalPrice: selectedProduct.price * value,
+        }));
+      }
+    } else {
+      setNewSale((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Find the selected product
     const selectedProduct = products.find(
       (product) => product.id === parseInt(newSale.productId)
     );
@@ -47,27 +67,22 @@ const Sales = () => {
       return;
     }
 
-    // Check if enough stock is available
     if (selectedProduct.stock < parseInt(newSale.quantity)) {
       alert("Not enough stock available.");
       return;
     }
 
-    // Post the sale
     axios
       .post("http://localhost:5000/api/sales", newSale)
       .then((res) => {
-        // Update the sales list
         setSales((prevSales) => [...prevSales, res.data]);
 
-        // Update the product stock
         const updatedStock = selectedProduct.stock - parseInt(newSale.quantity);
         axios
           .put(`http://localhost:5000/api/products/${selectedProduct.id}`, {
             stock: updatedStock,
           })
           .then(() => {
-            // Update the products list in state
             setProducts((prevProducts) =>
               prevProducts.map((product) =>
                 product.id === selectedProduct.id
@@ -78,17 +93,25 @@ const Sales = () => {
           })
           .catch((err) => console.error("Error updating product stock:", err));
 
-        // Reset the form
         setNewSale({ productId: "", quantity: "", totalPrice: "" });
       })
       .catch((err) => console.error(err));
   };
 
+  const handleRemoveSale = (id) => {
+    axios
+      .delete(`http://localhost:5000/api/sales/${id}`)
+      .then(() => {
+        setSales((prevSales) => prevSales.filter((sale) => sale.id !== id));
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       <h2>Sales</h2>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
+      <form onSubmit={handleSubmit}>
         <select
           name="productId"
           value={newSale.productId}
@@ -116,8 +139,7 @@ const Sales = () => {
           placeholder="Total Price"
           step="0.01"
           value={newSale.totalPrice}
-          onChange={handleChange}
-          required
+          readOnly
         />
         <button type="submit">Add Sale</button>
       </form>
@@ -129,6 +151,9 @@ const Sales = () => {
             {products.find((p) => p.id === s.productId)?.name || "Unknown"} -{" "}
             Quantity: {s.quantity} - Total Price: {s.totalPrice} - Date:{" "}
             {new Date(s.date).toLocaleString()}
+            <button onClick={() => handleRemoveSale(s.id)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>

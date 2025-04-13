@@ -28,13 +28,11 @@ const Products = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Check if the product already exists
     const existingProduct = products.find(
       (product) => product.name.toLowerCase() === newProduct.name.toLowerCase()
     );
 
     if (existingProduct) {
-      // Update the existing product's stock and price
       const updatedProduct = {
         ...existingProduct,
         stock: parseInt(existingProduct.stock) + parseInt(newProduct.stock),
@@ -53,7 +51,6 @@ const Products = () => {
         })
         .catch((err) => console.error(err));
     } else {
-      // Add a new product
       axios
         .post("http://localhost:5000/api/products", newProduct)
         .then((res) => {
@@ -64,23 +61,43 @@ const Products = () => {
     }
   };
 
+  const handleRemove = (id) => {
+    axios
+      .delete(`http://localhost:5000/api/products/${id}`)
+      .then(() => {
+        setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       <h2>Productos</h2>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
+      <form onSubmit={handleSubmit}>
+        <select
+          name="name"
+          value={newProduct.name}
+          onChange={handleChange}
+        >
+          <option value="">Select a Product</option>
+          {products.map((product) => (
+            <option key={product.id} value={product.name}>
+              {product.name}
+            </option>
+          ))}
+        </select>
         <input
           type="text"
           name="name"
-          placeholder="Nombre del producto"
+          placeholder="Or type product name"
           value={newProduct.name}
           onChange={handleChange}
-          required
         />
         <input
           type="number"
           name="stock"
-          placeholder="Cantidad"
+          placeholder="Quantity"
           value={newProduct.stock}
           onChange={handleChange}
           required
@@ -88,19 +105,22 @@ const Products = () => {
         <input
           type="number"
           name="price"
-          placeholder="Precio"
+          placeholder="Price"
           step="0.01"
           value={newProduct.price}
           onChange={handleChange}
           required
         />
-        <button type="submit">Agregar producto</button>
+        <button type="submit">Add product</button>
       </form>
 
       <ul>
         {products.map((p) => (
           <li key={p.id}>
-            {p.name} - {p.stock} unidades - {p.price} C$
+            {p.name} - {p.stock} units - {p.price} C$
+            <button onClick={() => handleRemove(p.id)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>

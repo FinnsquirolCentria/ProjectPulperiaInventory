@@ -46,14 +46,38 @@ app.post("/api/sales", async (req, res) => {
 // Dashboard Routes
 app.get("/api/sales/summary", async (req, res) => {
   try {
+    const { filter } = req.query;
+
+    let groupBy;
+    switch (filter) {
+      case "week":
+        groupBy = sequelize.fn("YEARWEEK", sequelize.col("date"));
+        break;
+      case "month":
+        groupBy = sequelize.fn("DATE_FORMAT", sequelize.col("date"), "%Y-%m");
+        break;
+      case "year":
+        groupBy = sequelize.fn("YEAR", sequelize.col("date"));
+        break;
+      case "day":
+      default:
+        groupBy = sequelize.fn("DATE", sequelize.col("date"));
+        break;
+    }
+
     const summary = await models.Sale.findAll({
       attributes: [
         [sequelize.fn("SUM", sequelize.col("totalPrice")), "total"],
-        [sequelize.fn("DATE", sequelize.col("date")), "date"],
+        [groupBy, "date"],
       ],
       group: ["date"],
+      order: [[sequelize.col("date"), "ASC"]],
     });
-    res.json(summary);
+
+    res.json(summary.map((item) => ({
+      date: item.dataValues.date,
+      total: parseFloat(item.dataValues.total),
+    })));
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch sales summary", err });
   }
@@ -98,6 +122,30 @@ app.get("/api/products/top-selling", async (req, res) => {
     );
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch top-selling products", err });
+  }
+});
+
+app.delete("/api/sales/:id", async (req, res) => {
+  try {
+    const sale = await models.Sale.findByPk(req.params.id);
+    if (!sale) {
+      return res.status(404).json({ message: "Sale not found" });
+    }
+    await sale.destroy();
+    res.json({ message: "Sale deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete sale", err });
+  }
+});
+
+app.get("/api/sales/reports", async (req, res) => {
+  try {
+    const reports = await models.Sale.findAll({
+      include: [{ model: models.Product, attributes: ["name"] }],
+    });
+    res.json(reports);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch sales reports", err });
   }
 });
 

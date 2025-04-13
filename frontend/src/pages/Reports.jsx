@@ -4,6 +4,7 @@ import axios from "axios";
 const Reports = () => {
   const [salesData, setSalesData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchSalesReports();
@@ -15,6 +16,7 @@ const Reports = () => {
       setSalesData(response.data);
     } catch (error) {
       console.error("Error fetching sales reports:", error);
+      setError("Failed to fetch sales reports. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -24,8 +26,12 @@ const Reports = () => {
     return <div>Loading...</div>;
   }
 
+  if (error) {
+    return <div>{error}</div>;
+  }
+
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       <h2>Sales Reports</h2>
       <table>
         <thead>
@@ -40,7 +46,7 @@ const Reports = () => {
           {salesData.map((sale) => (
             <tr key={sale.id}>
               <td>{new Date(sale.date).toLocaleDateString()}</td>
-              <td>{sale.product.name}</td>
+              <td>{sale.Product?.name || "Unknown"}</td>
               <td>{sale.quantity}</td>
               <td>{sale.totalPrice.toFixed(2)} C$</td>
             </tr>
