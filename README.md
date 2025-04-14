@@ -49,7 +49,7 @@ cd backend
 ```
 2. Install dependecies:
 ```bash
-npm install
+npm install  express sequelize mysql2 dotenv cors body-parser
 ```
 3. Create a .env file in the backend folder:
 ```bash
@@ -74,7 +74,7 @@ cd frontend
 
 2. Install dependencies:
 ```bash
-npm install
+npm install react react-router-dom axios chart.js
 ```
 
 3. Start frontend development server:
