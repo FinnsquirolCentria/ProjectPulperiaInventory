@@ -117,7 +117,7 @@ const Products = () => {
       <ul>
         {products.map((p) => (
           <li key={p.id}>
-            {p.name} - {p.stock} units - {p.price} C$
+            {p.name} | {p.stock} units | {p.price} C$
             <button onClick={() => handleRemove(p.id)}>
               Delete
             </button>

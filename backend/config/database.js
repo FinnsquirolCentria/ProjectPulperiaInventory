@@ -1,6 +1,7 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
+// Initialize a Sequelize instance to connect and interact with a MySQL database using environment variables.
 const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,

@@ -12,16 +12,16 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Basic Route (test)
+// Basic route (test)
 app.get("/", (req, res) => {
-  res.send("Pulpería Inventory API is running ✅");
+  res.send("Pulpería Inventory API is running");
 });
 
-// Product Routes
+// Product routes
 const productRoutes = require("./routes/products");
 app.use("/api/products", productRoutes);
 
-// Sales Routes
+// Sales routes for fetching
 app.get("/api/sales", async (req, res) => {
   try {
     const sales = await models.Sale.findAll({
@@ -33,56 +33,56 @@ app.get("/api/sales", async (req, res) => {
   }
 });
 
+// Sales routes for updating
 app.post("/api/sales", async (req, res) => {
   try {
     const { productId, quantity, totalPrice } = req.body;
-    const sale = await models.Sale.create({ productId, quantity, totalPrice });
+
+    // Fetch the product name
+    const product = await models.Product.findByPk(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Create the sale with the product name
+    const sale = await models.Sale.create({
+      productId,
+      productName: product.name, // Store the product name
+      quantity,
+      totalPrice,
+    });
+
     res.status(201).json(sale);
   } catch (err) {
     res.status(500).json({ error: "Failed to record sale", err });
   }
 });
 
-// Dashboard Routes
+// Dashboard routes
 app.get("/api/sales/summary", async (req, res) => {
   try {
-    const { filter } = req.query;
-
-    let groupBy;
-    switch (filter) {
-      case "week":
-        groupBy = sequelize.fn("YEARWEEK", sequelize.col("date"));
-        break;
-      case "month":
-        groupBy = sequelize.fn("DATE_FORMAT", sequelize.col("date"), "%Y-%m");
-        break;
-      case "year":
-        groupBy = sequelize.fn("YEAR", sequelize.col("date"));
-        break;
-      case "day":
-      default:
-        groupBy = sequelize.fn("DATE", sequelize.col("date"));
-        break;
-    }
-
     const summary = await models.Sale.findAll({
       attributes: [
-        [sequelize.fn("SUM", sequelize.col("totalPrice")), "total"],
-        [groupBy, "date"],
+        "productName", // Use productName directly
+        [sequelize.fn("SUM", sequelize.col("totalPrice")), "totalRevenue"],
       ],
-      group: ["date"],
-      order: [[sequelize.col("date"), "ASC"]],
+      group: ["productName"], // Group by productName
+      order: [[sequelize.fn("SUM", sequelize.col("totalPrice")), "DESC"]],
     });
 
-    res.json(summary.map((item) => ({
-      date: item.dataValues.date,
-      total: parseFloat(item.dataValues.total),
-    })));
+    res.json(
+      summary.map((item) => ({
+        productName: item.productName,
+        totalRevenue: parseFloat(item.dataValues.totalRevenue),
+      }))
+    );
   } catch (err) {
+    console.error("Error fetching sales summary:", err);
     res.status(500).json({ error: "Failed to fetch sales summary", err });
   }
 });
 
+// Fetch low stock products
 app.get("/api/products/low-stock", async (req, res) => {
   try {
     const lowStockProducts = await models.Product.findAll({
@@ -101,6 +101,7 @@ app.get("/api/products/low-stock", async (req, res) => {
   }
 });
 
+// Fetch top-selling products
 app.get("/api/products/top-selling", async (req, res) => {
   try {
     const topSelling = await models.Sale.findAll({
@@ -108,6 +109,9 @@ app.get("/api/products/top-selling", async (req, res) => {
         "productId",
         [sequelize.fn("SUM", sequelize.col("quantity")), "salesCount"],
       ],
+      where: {
+        productId: { [models.Sequelize.Op.ne]: null }, // Exclude sales with NULL productId
+      },
       group: ["productId"],
       order: [[sequelize.fn("SUM", sequelize.col("quantity")), "DESC"]],
       limit: 5,
@@ -116,15 +120,17 @@ app.get("/api/products/top-selling", async (req, res) => {
     res.json(
       topSelling.map((sale) => ({
         id: sale.productId,
-        name: sale.Product.name,
+        name: sale.Product?.name || "Unknown", // Handle missing product gracefully
         salesCount: sale.dataValues.salesCount,
       }))
     );
   } catch (err) {
+    console.error("Error fetching top-selling products:", err); // Log the error for debugging
     res.status(500).json({ error: "Failed to fetch top-selling products", err });
   }
 });
 
+// Sales routes for deleting base on ID
 app.delete("/api/sales/:id", async (req, res) => {
   try {
     const sale = await models.Sale.findByPk(req.params.id);
@@ -138,6 +144,7 @@ app.delete("/api/sales/:id", async (req, res) => {
   }
 });
 
+// Sales reports route
 app.get("/api/sales/reports", async (req, res) => {
   try {
     const reports = await models.Sale.findAll({
@@ -149,15 +156,15 @@ app.get("/api/sales/reports", async (req, res) => {
   }
 });
 
-// Database Sync
+//  Database connection and server start
 sequelize
   .sync({ alter: true }) // use { force: true } to reset tables
   .then(() => {
-    console.log("✅ Database synced successfully.");
+    console.log("Database synced successfully.");
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`Server running on http://localhost:${PORT}`);
     });
   })
   .catch((error) => {
-    console.error("❌ Failed to sync database:", error);
+    console.error("Failed to sync database:", error);
   });

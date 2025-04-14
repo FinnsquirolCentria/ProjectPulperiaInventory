@@ -30,7 +30,7 @@ const Home = () => {
 
   const fetchSalesSummary = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/sales/summary?filter=${timeFilter}`);
+      const response = await axios.get("http://localhost:5000/api/sales/summary");
       setSalesSummary(response.data);
     } catch (error) {
       console.error("Error fetching sales summary:", error);
@@ -67,11 +67,11 @@ const Home = () => {
     chartInstance.current = new Chart(chartRef.current, {
       type: chartType,
       data: {
-        labels: salesSummary.map((sale) => sale.date),
+        labels: salesSummary.map((sale) => sale.productName), // Use product names as labels
         datasets: [
           {
-            label: "Total Revenue",
-            data: salesSummary.map((sale) => sale.total),
+            label: `Total Revenue: ${salesSummary.reduce((sum, sale) => sum + sale.totalRevenue, 0).toFixed(2)} C$ (${timeFilter.charAt(0).toUpperCase() + timeFilter.slice(1)})`,
+            data: salesSummary.map((sale) => sale.totalRevenue), // Use total revenue as data
             backgroundColor: colors,
             borderColor: colors.map((color) => color),
             borderWidth: 1,
@@ -95,7 +95,7 @@ const Home = () => {
           x: {
             title: {
               display: true,
-              text: "Date",
+              text: "Product",
             },
           },
           y: {
@@ -136,20 +136,28 @@ const Home = () => {
       </div>
 
       <h2>Low Stock Alerts</h2>
-      <ul className="alerts">
-        {lowStockAlerts.map((alert) => (
-          <li key={alert.productId}>{alert.message}</li>
-        ))}
-      </ul>
+      {lowStockAlerts.length > 0 ? (
+        <ul className="alerts">
+          {lowStockAlerts.map((alert) => (
+            <li key={alert.productId}>{alert.message}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>No low stock alerts at the moment. All products are sufficiently stocked!</p>
+      )}
 
       <h2>Top Selling Products</h2>
-      <ul className="top-products">
-        {topSellingProducts.map((product) => (
-          <li key={product.id}>
-            {product.name}: {product.salesCount} sold
-          </li>
-        ))}
-      </ul>
+      {topSellingProducts.length > 0 ? (
+        <ul className="top-products">
+          {topSellingProducts.map((product) => (
+            <li key={product.id}>
+              <b>{product.name}:</b> {product.salesCount} sold
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No top-selling products yet. Start recording sales to see the top performers!</p>
+      )}
     </div>
   );
 };

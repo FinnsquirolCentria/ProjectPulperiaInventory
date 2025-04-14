@@ -46,7 +46,7 @@ const Reports = () => {
           {salesData.map((sale) => (
             <tr key={sale.id}>
               <td>{new Date(sale.date).toLocaleDateString()}</td>
-              <td>{sale.Product?.name || "Unknown"}</td>
+              <td>{sale.productName || "Unknown"}</td>
               <td>{sale.quantity}</td>
               <td>{sale.totalPrice.toFixed(2)} C$</td>
             </tr>

@@ -7,3 +7,9 @@
 | 21.3.2025 | 3.5 | Planning the phase 1  | UI Prototype |
 | 22.3.2025 | 2 | Planning the phase 1  | Defined Information architecture and Technical Design  |  
 | 22.3.2025 | 2 | Planning the phase 1  | Project management and user testing |
+| 5.4.2025 | 5 | Backend development  | Created the backend server  |  
+| 5.4.2025 | 4 | Frontend development  | Added basic functionalities to test the connection wit the backend |
+| 7.4.2025 | 6 | Backend poulishing | Added and poulished functionalities |  
+| 8.4.2025 | 7 | Frontend development  | Added more functionalities and poulished |
+| 13.4.2025 | 3 | Testing  | Added more functionalities and poulished |
+| 14.4.2025 | 4 | Changed things based on tests  | Added more functionalities and poulished |

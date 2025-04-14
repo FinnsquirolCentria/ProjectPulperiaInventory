@@ -7,19 +7,29 @@ const Sidebar = () => {
       <nav>
         <ul>
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/">
+            <img src="/icons/home.png" alt="Home" className="icon" />
+              Home
+            </Link>
           </li>
           <li>
-            <Link to="/products">Products</Link>
+
+            <Link to="/products">
+              <img src="/icons/products.png" alt="Products" className="icon" />
+              Products
+            </Link>
           </li>
           <li>
-            <Link to="/sales">Sales</Link>
+            <Link to="/sales">
+              <img src="/icons/sales.png" alt="Sales" className="icon" />
+              Sales
+            </Link>
           </li>
           <li>
-            <Link to="/reports">Reports</Link>
-          </li>
-          <li>
-            <Link to="/settings">Settings</Link>
+            <Link to="/reports">
+              <img src="/icons/report.png" alt="Reports" className="icon" />
+              Reports
+            </Link>
           </li>
         </ul>
       </nav>

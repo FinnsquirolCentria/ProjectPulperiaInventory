@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
+// Define the Alert model for the alerts table in the database
 const Alert = sequelize.define("Alert", {
   productId: {
     type: DataTypes.INTEGER,

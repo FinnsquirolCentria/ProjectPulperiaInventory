@@ -147,13 +147,10 @@ const Sales = () => {
       <ul>
         {sales.map((s) => (
           <li key={s.id}>
-            Product:{" "}
-            {products.find((p) => p.id === s.productId)?.name || "Unknown"} -{" "}
-            Quantity: {s.quantity} - Total Price: {s.totalPrice} - Date:{" "}
+            <b>Product: </b> {s.productName || "Unknown"} | 
+            <b> Quantity: </b> {s.quantity} | <b>Total Price: </b> {s.totalPrice.toFixed(2)} C$ | <b> Date: </b>{" "}
             {new Date(s.date).toLocaleString()}
-            <button onClick={() => handleRemoveSale(s.id)}>
-              Delete
-            </button>
+            <button onClick={() => handleRemoveSale(s.id)}>Delete</button>
           </li>
         ))}
       </ul>
