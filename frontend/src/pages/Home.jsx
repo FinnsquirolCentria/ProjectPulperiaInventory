@@ -158,6 +158,15 @@ const Home = () => {
       ) : (
         <p>No top-selling products yet. Start recording sales to see the top performers!</p>
       )}
+
+      <h2>Recent Sales Activity</h2>
+      <ul>
+        {salesSummary.map((sale) => (
+          <li key={sale.productName}>
+            {sale.productName}: {sale.totalRevenue.toFixed(2)} C$ in revenue
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

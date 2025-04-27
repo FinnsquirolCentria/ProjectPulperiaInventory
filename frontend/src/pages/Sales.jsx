@@ -57,26 +57,26 @@ const Sales = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     const selectedProduct = products.find(
       (product) => product.id === parseInt(newSale.productId)
     );
-
+  
     if (!selectedProduct) {
       alert("Invalid product selected.");
       return;
     }
-
+  
     if (selectedProduct.stock < parseInt(newSale.quantity)) {
       alert("Not enough stock available.");
       return;
     }
-
+  
     axios
       .post("http://localhost:5000/api/sales", newSale)
       .then((res) => {
         setSales((prevSales) => [...prevSales, res.data]);
-
+  
         const updatedStock = selectedProduct.stock - parseInt(newSale.quantity);
         axios
           .put(`http://localhost:5000/api/products/${selectedProduct.id}`, {
@@ -92,8 +92,9 @@ const Sales = () => {
             );
           })
           .catch((err) => console.error("Error updating product stock:", err));
-
+  
         setNewSale({ productId: "", quantity: "", totalPrice: "" });
+        alert("Sale recorded successfully!"); // Confirmation message
       })
       .catch((err) => console.error(err));
   };

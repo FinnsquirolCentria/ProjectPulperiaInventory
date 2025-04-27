@@ -31,6 +31,13 @@ const Sidebar = () => {
               Reports
             </Link>
           </li>
+          <li>
+            <Link to="/stores">
+              <img src="/icons/stores.png" alt="Stores" className="icon" />
+              Store Status
+            </Link>
+          </li>
+                    
         </ul>
       </nav>
     </div>

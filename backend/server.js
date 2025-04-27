@@ -3,6 +3,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const models = require("./models");
 const sequelize = require("./config/database");
+const storeRoutes = require("./routes/stores");
+
 require("dotenv").config(); // Load environment variables
 
 const app = express();
@@ -93,7 +95,7 @@ app.get("/api/products/low-stock", async (req, res) => {
     res.json(
       lowStockProducts.map((product) => ({
         productId: product.id,
-        message: `${product.name} is running low on stock (${product.stock} units left).`,
+        message: `${product.name} is running low on stock (${product.stock} units left). Consider restocking.`,
       }))
     );
   } catch (err) {
@@ -155,6 +157,8 @@ app.get("/api/sales/reports", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch sales reports", err });
   }
 });
+
+app.use("/api/stores", storeRoutes);
 
 //  Database connection and server start
 sequelize

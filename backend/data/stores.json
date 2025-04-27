@@ -1,0 +1,18 @@
+[
+    {
+      "id": 1,
+      "name": "Pulpería La Esquina",
+      "latitude": 63.839173,
+      "longitude": 23.138025,
+      "status": "Open",
+      "products": ["Rice", "Beans", "Oil"]
+    },
+    {
+      "id": 2,
+      "name": "Pulpería Central",
+      "latitude": 63.83771,
+      "longitude":  23.141189,
+      "status": "Closed",
+      "products": ["Sugar", "Milk", "Eggs"]
+    }
+  ]

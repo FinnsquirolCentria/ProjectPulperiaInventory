@@ -3,11 +3,13 @@ import axios from "axios";
 
 const Reports = () => {
   const [salesData, setSalesData] = useState([]);
+  const [lowStockAlerts, setLowStockAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchSalesReports();
+    fetchLowStockAlerts();
   }, []);
 
   const fetchSalesReports = async () => {
@@ -20,6 +22,36 @@ const Reports = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchLowStockAlerts = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/products/low-stock");
+      setLowStockAlerts(response.data);
+    } catch (error) {
+      console.error("Error fetching low stock alerts:", error);
+    }
+  };
+
+  const exportToCSV = (data) => {
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      ["Date,Product,Quantity Sold,Total Revenue"]
+        .concat(
+          data.map(
+            (sale) =>
+              `${new Date(sale.date).toLocaleDateString()},${sale.productName},${sale.quantity},${sale.totalPrice.toFixed(
+                2
+              )}`
+          )
+        )
+        .join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "sales_reports.csv");
+    document.body.appendChild(link);
+    link.click();
   };
 
   if (loading) {
@@ -53,6 +85,18 @@ const Reports = () => {
           ))}
         </tbody>
       </table>
+      <button onClick={() => exportToCSV(salesData)}>Download to CSV</button>
+
+      <h2>Low Stock Alerts</h2>
+      {lowStockAlerts.length > 0 ? (
+        <ul>
+          {lowStockAlerts.map((alert) => (
+            <li key={alert.productId}>{alert.message}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>No low stock alerts at the moment. All products are sufficiently stocked!</p>
+      )}
     </div>
   );
 };
