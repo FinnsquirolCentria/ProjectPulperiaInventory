@@ -2,15 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-
-// Fix for default marker icon issue in Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-});
 
 const StoreStatus = () => {
   const [location, setLocation] = useState(null);
@@ -24,7 +15,6 @@ const StoreStatus = () => {
   }, []);
 
   useEffect(() => {
-    // Filter stores based on the search query
     const filtered = stores.filter((store) =>
       store.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -57,7 +47,7 @@ const StoreStatus = () => {
         `http://localhost:5000/api/stores/nearby?lat=${latitude}&lng=${longitude}`
       );
       setStores(response.data);
-      setFilteredStores(response.data); // Initialize filtered stores
+      setFilteredStores(response.data);
     } catch (error) {
       console.error("Error fetching nearby stores:", error);
       setError("Failed to fetch nearby stores. Please try again later.");
@@ -79,29 +69,22 @@ const StoreStatus = () => {
   };
 
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ width: "300px", padding: "2rem", backgroundColor: "#f4f4f9", borderRight: "1px solid #ccc" }}>
+    <div className="store-status">
+      <div className="sidebar">
         <h3>Search Pulperías</h3>
         <input
           type="text"
           placeholder="Search by name..."
           value={searchQuery}
           onChange={handleSearchChange}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
         />
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <ul>
           {filteredStores.map((store) => (
             <li
               key={store.id}
-              style={{
-                padding: "10px",
-                marginBottom: "5px",
-                backgroundColor: "#fff",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-              onClick={() => setLocation({ latitude: store.latitude, longitude: store.longitude })}
+              onClick={() =>
+                setLocation({ latitude: store.latitude, longitude: store.longitude })
+              }
             >
               <b>{store.name}</b>
               <p>Status: {store.status}</p>
@@ -111,14 +94,14 @@ const StoreStatus = () => {
         </ul>
       </div>
 
-      <div style={{ flex: 1 }}>
+      <div className="map-container">
         <h2>Nearby Pulperías</h2>
         {error && <p>{error}</p>}
         {location && (
           <MapContainer
             center={[location.latitude, location.longitude]}
             zoom={15}
-            style={{ height: "500px", width: "100%" }}
+            style={{ height: "100%", width: "100%" }}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

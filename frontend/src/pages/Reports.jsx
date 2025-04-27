@@ -40,9 +40,9 @@ const Reports = () => {
   };
 
   return (
-    <div>
+    <div className="reports">
       <h2>Sales Reports</h2>
-      <div>
+      <div className="filter-container">
         <label htmlFor="timeFilter">Timeframe:</label>
         <select
           id="timeFilter"
@@ -55,44 +55,33 @@ const Reports = () => {
           <option value="year">Yearly</option>
         </select>
       </div>
-      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
+      <table className="table">
         <thead>
           <tr>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Product Name</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Total Quantity</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Total Revenue</th>
+            <th>Product Name</th>
+            <th>Total Quantity</th>
+            <th>Total Revenue</th>
           </tr>
         </thead>
         <tbody>
           {salesData.length > 0 ? (
             salesData.map((item, index) => (
               <tr key={index}>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{item.productName}</td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{item.totalQuantity}</td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{item.totalRevenue}</td>
+                <td>{item.productName}</td>
+                <td>{item.totalQuantity}</td>
+                <td>{item.totalRevenue}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="3" style={{ textAlign: "center", padding: "8px" }}>
+              <td colSpan="3" className="no-data">
                 No data available for the selected timeframe.
               </td>
             </tr>
           )}
         </tbody>
       </table>
-      <button
-        onClick={() => exportToCSV(salesData)}
-        style={{
-          marginTop: "20px",
-          padding: "10px 20px",
-          backgroundColor: "#007BFF",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
+      <button className="btn-primary" onClick={() => exportToCSV(salesData)}>
         Export to CSV
       </button>
     </div>
