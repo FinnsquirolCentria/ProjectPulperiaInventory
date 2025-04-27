@@ -30,7 +30,7 @@ const Home = () => {
 
   const fetchSalesSummary = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/sales/summary");
+      const response = await axios.get(`http://localhost:5000/api/sales/summary?timeFilter=${timeFilter}`);
       setSalesSummary(response.data);
     } catch (error) {
       console.error("Error fetching sales summary:", error);

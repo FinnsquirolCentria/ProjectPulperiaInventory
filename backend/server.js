@@ -62,8 +62,41 @@ app.post("/api/sales", async (req, res) => {
 
 // Dashboard routes
 app.get("/api/sales/summary", async (req, res) => {
+  const { timeFilter } = req.query;
+
+  // Determine the date range based on the timeFilter
+  let startDate;
+  const endDate = new Date(); // Current date
+  switch (timeFilter) {
+    case "day":
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 1); // Last 24 hours
+      break;
+    case "week":
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 7); // Last 7 days
+      break;
+    case "month":
+      startDate = new Date();
+      startDate.setMonth(endDate.getMonth() - 1); // Last month
+      break;
+    case "year":
+      startDate = new Date();
+      startDate.setFullYear(endDate.getFullYear() - 1); // Last year
+      break;
+    default:
+      startDate = null; // No filtering
+  }
+
   try {
+    // Build the where clause for filtering by date
+    const whereClause = startDate
+      ? { createdAt: { [models.Sequelize.Op.between]: [startDate, endDate] } }
+      : {};
+
+    // Fetch sales data with optional date filtering
     const summary = await models.Sale.findAll({
+      where: whereClause,
       attributes: [
         "productName", // Use productName directly
         [sequelize.fn("SUM", sequelize.col("totalPrice")), "totalRevenue"],
@@ -148,13 +181,62 @@ app.delete("/api/sales/:id", async (req, res) => {
 
 // Sales reports route
 app.get("/api/sales/reports", async (req, res) => {
+  const { timeFilter, productId } = req.query;
+
+  // Determine the date range based on the timeFilter
+  let startDate;
+  const endDate = new Date();
+  switch (timeFilter) {
+    case "day":
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 1);
+      break;
+    case "week":
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 7);
+      break;
+    case "month":
+      startDate = new Date();
+      startDate.setMonth(endDate.getMonth() - 1);
+      break;
+    case "year":
+      startDate = new Date();
+      startDate.setFullYear(endDate.getFullYear() - 1);
+      break;
+    default:
+      startDate = null;
+  }
+
   try {
-    const reports = await models.Sale.findAll({
-      include: [{ model: models.Product, attributes: ["name"] }],
+    const whereClause = startDate
+      ? { createdAt: { [models.Sequelize.Op.between]: [startDate, endDate] } }
+      : {};
+
+    if (productId) {
+      whereClause.productId = productId;
+    }
+
+    const sales = await models.Sale.findAll({
+      where: whereClause,
+      attributes: [
+        "productName",
+        [sequelize.fn("SUM", sequelize.col("quantity")), "totalQuantity"],
+        [sequelize.fn("SUM", sequelize.col("totalPrice")), "totalRevenue"],
+      ],
+      group: ["productName"],
+      order: [[sequelize.fn("SUM", sequelize.col("totalPrice")), "DESC"]],
     });
-    res.json(reports);
+
+    res.json(
+      sales.map((sale) => ({
+        productName: sale.productName,
+        totalQuantity: parseInt(sale.dataValues.totalQuantity),
+        totalRevenue: parseFloat(sale.dataValues.totalRevenue),
+      }))
+    );
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch sales reports", err });
+    console.error("Error fetching sales reports:", err);
+    res.status(500).json({ error: "Failed to fetch sales reports" });
   }
 });
 

@@ -1,102 +1,100 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 const Reports = () => {
+  const [timeFilter, setTimeFilter] = useState("day");
   const [salesData, setSalesData] = useState([]);
-  const [lowStockAlerts, setLowStockAlerts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchSalesReports();
-    fetchLowStockAlerts();
-  }, []);
+  }, [timeFilter]);
 
   const fetchSalesReports = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/sales/reports");
+      const response = await axios.get(
+        `http://localhost:5000/api/sales/reports?timeFilter=${timeFilter}`
+      );
       setSalesData(response.data);
     } catch (error) {
       console.error("Error fetching sales reports:", error);
-      setError("Failed to fetch sales reports. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchLowStockAlerts = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/products/low-stock");
-      setLowStockAlerts(response.data);
-    } catch (error) {
-      console.error("Error fetching low stock alerts:", error);
     }
   };
 
   const exportToCSV = (data) => {
     const csvContent =
       "data:text/csv;charset=utf-8," +
-      ["Date,Product,Quantity Sold,Total Revenue"]
+      ["Product Name,Total Quantity,Total Revenue"]
         .concat(
           data.map(
-            (sale) =>
-              `${new Date(sale.date).toLocaleDateString()},${sale.productName},${sale.quantity},${sale.totalPrice.toFixed(
-                2
-              )}`
+            (item) =>
+              `${item.productName},${item.totalQuantity},${item.totalRevenue}`
           )
         )
         .join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "sales_reports.csv");
+    link.setAttribute("download", "sales_report.csv");
     document.body.appendChild(link);
     link.click();
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
   return (
     <div>
       <h2>Sales Reports</h2>
-      <table>
+      <div>
+        <label htmlFor="timeFilter">Timeframe:</label>
+        <select
+          id="timeFilter"
+          value={timeFilter}
+          onChange={(e) => setTimeFilter(e.target.value)}
+        >
+          <option value="day">Daily</option>
+          <option value="week">Weekly</option>
+          <option value="month">Monthly</option>
+          <option value="year">Yearly</option>
+        </select>
+      </div>
+      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Product</th>
-            <th>Quantity Sold</th>
-            <th>Total Revenue</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Product Name</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Total Quantity</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Total Revenue</th>
           </tr>
         </thead>
         <tbody>
-          {salesData.map((sale) => (
-            <tr key={sale.id}>
-              <td>{new Date(sale.date).toLocaleDateString()}</td>
-              <td>{sale.productName || "Unknown"}</td>
-              <td>{sale.quantity}</td>
-              <td>{sale.totalPrice.toFixed(2)} C$</td>
+          {salesData.length > 0 ? (
+            salesData.map((item, index) => (
+              <tr key={index}>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{item.productName}</td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{item.totalQuantity}</td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{item.totalRevenue}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3" style={{ textAlign: "center", padding: "8px" }}>
+                No data available for the selected timeframe.
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
-      <button onClick={() => exportToCSV(salesData)}>Download to CSV</button>
-
-      <h2>Low Stock Alerts</h2>
-      {lowStockAlerts.length > 0 ? (
-        <ul>
-          {lowStockAlerts.map((alert) => (
-            <li key={alert.productId}>{alert.message}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>No low stock alerts at the moment. All products are sufficiently stocked!</p>
-      )}
+      <button
+        onClick={() => exportToCSV(salesData)}
+        style={{
+          marginTop: "20px",
+          padding: "10px 20px",
+          backgroundColor: "#007BFF",
+          color: "#fff",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
+        Export to CSV
+      </button>
     </div>
   );
 };

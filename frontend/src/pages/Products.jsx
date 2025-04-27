@@ -72,7 +72,7 @@ const Products = () => {
 
   return (
     <div>
-      <h2>Productos</h2>
+      <h2>Products</h2>
 
       <form onSubmit={handleSubmit}>
         <select
