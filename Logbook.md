@@ -15,3 +15,5 @@
 | 14.4.2025 | 4 | Changed things based on tests  | Added more functionalities and poulished |
 | 22.4.2025 | 4.5 | Polished existing features  | Polished features |
 | 23.4.2025 | 8 | Added pulperia location feature  | Added more functionalities |
+| 24.4.2025 | 2 | Solved error to filter correctly by day, week, month, year  in the sales summary | Corrected errors |
+| 24.4.2025 | 2 | Additional feature for sales report | added features |
