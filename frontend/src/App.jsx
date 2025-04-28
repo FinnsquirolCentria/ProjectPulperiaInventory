@@ -1,26 +1,76 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import Home from './pages/Home';
-import Products from './pages/Products';
-import Sales from './pages/Sales';
-import Reports from './pages/Reports';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import MainPage from "./pages/MainPage";
+import About from "./pages/About";
+import Users from "./pages/Users";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import Sales from "./pages/Sales";
+import Reports from "./pages/Reports";
+import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardLayout from "./components/Layout";
 import StoreStatus from "./pages/StoreStatus";
 
 function App() {
   return (
     <Router>
-      <div className="flex">
-        <Sidebar />
-        <div className="flex-1 p-4">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/sales" element={<Sales />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/stores" element={<StoreStatus />} />
-          </Routes>
-        </div>
-      </div>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<MainPage />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/users" element={<Users />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Home />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Products />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sales"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Sales />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Reports />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stores"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <StoreStatus />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
     </Router>
   );
 }

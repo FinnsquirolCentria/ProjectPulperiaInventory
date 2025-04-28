@@ -95,7 +95,6 @@ const StoreStatus = () => {
       </div>
 
       <div className="map-container">
-        <h2>Nearby Pulperías</h2>
         {error && <p>{error}</p>}
         {location && (
           <MapContainer

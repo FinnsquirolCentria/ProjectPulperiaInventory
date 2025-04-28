@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const models = require("./models");
 const sequelize = require("./config/database");
 const storeRoutes = require("./routes/stores");
+const userRoutes = require("./routes/users");
 
 require("dotenv").config(); // Load environment variables
 
@@ -70,19 +71,19 @@ app.get("/api/sales/summary", async (req, res) => {
   switch (timeFilter) {
     case "day":
       startDate = new Date();
-      startDate.setDate(endDate.getDate() - 1); // Last 24 hours
+      startDate.setDate(endDate.getDate() - 1);
       break;
     case "week":
       startDate = new Date();
-      startDate.setDate(endDate.getDate() - 7); // Last 7 days
+      startDate.setDate(endDate.getDate() - 7);
       break;
     case "month":
       startDate = new Date();
-      startDate.setMonth(endDate.getMonth() - 1); // Last month
+      startDate.setMonth(endDate.getMonth() - 1);
       break;
     case "year":
       startDate = new Date();
-      startDate.setFullYear(endDate.getFullYear() - 1); // Last year
+      startDate.setFullYear(endDate.getFullYear() - 1);
       break;
     default:
       startDate = null; // No filtering
@@ -165,7 +166,7 @@ app.get("/api/products/top-selling", async (req, res) => {
   }
 });
 
-// Sales routes for deleting base on ID
+// Sales routes for deleting based on ID
 app.delete("/api/sales/:id", async (req, res) => {
   try {
     const sale = await models.Sale.findByPk(req.params.id);
@@ -242,9 +243,11 @@ app.get("/api/sales/reports", async (req, res) => {
 
 app.use("/api/stores", storeRoutes);
 
-//  Database connection and server start
+app.use("/api/users", userRoutes);
+
+// Database connection and server start
 sequelize
-  .sync({ alter: true }) // use { force: true } to reset tables
+  .sync({ alter: true }) // Automatically create or update tables
   .then(() => {
     console.log("Database synced successfully.");
     app.listen(PORT, () => {

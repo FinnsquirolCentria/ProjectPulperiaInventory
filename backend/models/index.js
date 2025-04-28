@@ -1,11 +1,13 @@
 const sequelize = require("../config/database");
 
+const User = require("./User");
 const Product = require("./Product");
 const Sale = require("./Sale");
 const Alert = require("./Alert");
 
 // Define associations between models
 const models = {
+  User,
   Product,
   Sale,
   Alert,
